@@ -1,0 +1,113 @@
+Geometry = xyzFormat {
+<<< "Put the name of your XYZ file here"
+}
+
+Driver = VelocityVerlet {
+
+ Plumed = yes
+
+ MovedAtoms = 1:m n:-1 #define your constrained/active atoms here (see Plumed/dftbplus documentation for details)
+ TimeStep [fs] = 0.5
+ Steps = 40000 #trajectory length
+ KeepStationary = Yes
+ MDRestartFrequency = 10
+# ConvergentForcesOnly = Yes
+ 
+ Thermostat = Berendsen { 
+    Temperature [K] = 298.15 #define temperature here
+    Timescale[fs] = 100.0 #choose wisely for your system!
+ }
+# Barostat = {
+#    Pressure [Pa] = 101325.0
+#    Timescale[fs] = 100.0
+#    Isotropic = Yes
+# }
+}
+
+Hamiltonian = xTB {
+  Method = "GFN1-xTB" 	#computational method
+  
+  Solvation = GeneralizedBorn { # GBSA(water) or define your XTB1-2 specific solvent parameters
+	Solvent = fromConstants {
+	Epsilon = 80.2
+	MolecularMass [amu] = 18.0
+	Density [kg/l] = 0.998
+	}
+	FreeEnergyShift [kcal/mol] = 1.16556316
+	BornScale = 1.55243817
+	BornOffset = 2.462811043694508E-02
+	Radii = vanDerWaalsRadiiD3 {}
+	Descreening = Values {
+		H = 0.71893869
+		C = 0.74298311
+		N = 0.90261230
+		O = 0.75369019
+		P  =  0.66440982
+		S  =  0.89558269
+		F  =  0.61625017
+		Cl =  0.62985587
+		Br =  0.63761709
+		}
+	SASA {
+	ProbeRadius = 1.843075777670416
+	Radii = vanDerWaalsRadiiD3 {}
+	SurfaceTension = Values {
+		H = -3.34983060E-01
+		C = -7.47690650E-01
+		N = -2.31291292E+00
+		O = 9.17979110E-01
+		P  =  -0.28566074
+		S  =  -0.48555420
+		F  =   1.25543348
+		Cl =  -0.10208045
+		Br =  -0.28044414
+		}
+	}
+	HBondCorr = Yes
+	HBondStrength = Values {
+		H = -7.172800544988973E-02
+		C = -2.548469535762511E-03
+		N = -1.976849501504001E-02
+		O = -8.462476828587280E-03
+		P  = -1.1455849284e-02
+		S  = -2.3330538525e-04
+		F  = -6.3000058969e-03
+		Cl = -1.6889571059e-03
+		Br = -6.5202935249e-03
+	}
+  }
+  
+  ReadInitialCharges = No
+  
+  SCCTolerance = 1.e-06
+  MaxSCCIterations = 500
+  
+  #EwaldParameter = -1.0
+  #EwaldTolerance = 1.e-06
+  
+  Mixer = Broyden {} #Broyden
+  Solver = DivideAndConquer {}
+  Filling = Fermi {
+
+  Temperature [K] = 300
+
+}
+
+  
+  #KPointsAndWeights = { # Gamma-point only (There is no metals)
+  #0.0 0.0 0.0 1.0
+  #}
+    
+  Charge = -1 # total charge of the system
+
+}
+
+Options = {
+  WriteAutotestTag = Yes
+  WriteResultsTag = Yes
+}
+
+ParserOptions = {
+  ParserVersion = 11
+}
+
