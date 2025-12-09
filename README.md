@@ -36,13 +36,14 @@ Source code files are located in the `src/` directory, and usage examples can be
 │ ├── ORCA_launcher_multi.py # Parallel ORCA calculations
 │ ├── ORCA_2mkl_launcher.py # GBW to Molden conversion
 │ ├── XYZ_file_binder.py # Molecular linking tool
+| ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
 │ ├── opt_bader.inp # ORCA input template
 │ └── wfn_commands.txt # Multiwfn analysis script
 ├── examples/ # Example files and usage cases
 └── README.md # This file
 ```
 
-## Scripts and Files
+## Scripts and configuraion files
 
 All scripts are located in the `src/` directory.
 
@@ -58,7 +59,7 @@ Converts SMILES strings to 3D XYZ coordinates using OpenBabel's UFF force field 
 
 **Usage:**
 ```bash
-python src/SMILES_to_XYZ.py "SMILES_STRING" output_filename.xyz 
+python src/SMILES_to_XYZ.py n1ccccc1 pyridine.xyz 
 ```
 ### 2. Ligand_generator.py
 
@@ -72,7 +73,7 @@ Batch processes SMILES strings from a text file using SMILES_to_XYZ.py.
 
 **Usage:**
 ```bash
-python src/Ligand_generator.py input_smiles.txt folder_name
+python src/Ligand_generator.py examples/phosphate_molecules_examples generated_mols_dir
 ```
 ### 3. ORCA_launcher_multi.py
 
@@ -87,7 +88,7 @@ Organizes XYZ files and runs ORCA calculations with parallel execution.
 
 **Usage:**
 ```bash
-python src/ORCA_launcher_multi.py path_to_input_template path_to_orca_binary [num_parallel_flows]
+python src/ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary [num_parallel_flows]
 ```
 ### 4. ORCA_2mkl_launcher.py
 
@@ -100,7 +101,7 @@ Processes ORCA .gbw files to generate Molden format files.
 
 **Usage:**
 ```bash
-python src/ORCA_2mkl_launcher.py path_to_orca_2mkl_binary parent_folder
+python src/ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_parent_folder_with_subdirs_containing_gbw_files
 ```
 ### 5. XYZ_file_binder.py
 
@@ -114,11 +115,29 @@ Links two XYZ files by removing specified atoms and creating new bonds.
 
 **Usage:**
 ```bash
-python src/XYZ_file_binder.py file1.xyz file2.xyz atom_to_remove constraint_coefficient
+python src/XYZ_file_binder.py examples/A17_para_theozyme.xyz examples/Au_nitro.xyz Au 999
 ```
+
+### 6. Bader_PCA_analysis.py
+
+Performs principal component analysis (PCA) on QTAIM-derived Bader descriptors and assigns compounds to computational rounds using a grid-based distribution strategy.
+
+**Features:**
+- Loads QTAIM data from CSV files with European decimal format (comma as decimal separator)
+- Performs MinMax scaling followed by PCA transformation
+- Projects compounds onto a user-defined n_rows × m_cols grid in the PCA space
+- Distributes compounds across rounds by selecting one compound from each populated grid cell per round
+- Generates interactive Plotly visualizations (HTML) and static images (PNG) showing PCA results colored by round assignment
+- Outputs detailed text files with round assignments and grid cell contents
+
+**Usage:**
+```bash
+python src/Bader_PCA_analysis.py examples/QTAIM_data_example.csv 5 5
+```
+
 ### CONFIGURATION FILES
 
-### 6. opt_bader.inp
+### 7. opt_bader.inp
 
 ORCA input template for QTAIM analysis with relativistic corrections.
 
@@ -128,7 +147,7 @@ ORCA input template for QTAIM analysis with relativistic corrections.
 - Tight optimization criterion
 - Numerical frequencies
 
-### 7. wfn_commands.txt
+### 8. wfn_commands.txt
 
 Multiwfn script for wavefunction analysis.
 
@@ -137,18 +156,32 @@ Multiwfn script for wavefunction analysis.
 - Bond critical points
 - Atomic charges and volumes
 
+## Examples files
+The ```examples/``` directory contains several theozyme structures in XYZ format used in our original study, including models for rH BChe, S198C rHBChe, and the A17 catalytic antibody (see ```A17_para_theozyme.xyz```, ```BuChe_Cys_meta_theozyme.xyz```, ```BuChe_Ser_ortho_theozyme.xyz``` etc). This directory also includes examples of functional groups with modified linker atoms.
+- For completeness, typical input files (```dftb_in.hsd``` for DFTB+ and ```plumed.dat``` for metadynamics) are provided.
+- Additional files:
+  * ```QTAIM_data_example.csv```: example dataset from a QTAIM analysis, used to generate the chemical space population plots 
+  * ```Example_pca_visualization.png/.html```: typical 2D visualization output from the principal component analysis (PCA) of the QTAIM data.
+  * ```Example_rounds_assignment.txt```:  corresponding file showing the assigned *Rounds* distribution from the data analysis
+  * ```PMe3_Pd_PhBr.zip```: a ready-to-run archive for testing your DFTB+ installation. It contains input files for a DFTB+/metadynamics simulation of a small phosphine ligand system (PMe₃-Pd-PhBr), along with the required XYZ structure.
+
 ## Quick Start
 
 **Prerequisites:**
 - Python 3.6 or greater (compatible with all required packages). <ins>The code was created and tested on Python 3.8.19 version</ins>
-- OpenBabel 2.4.1: Install via conda: ```bash conda install -c conda-forge openbabel==2.4.1```
+- OpenBabel 3.1.1: Install via conda: ```conda install -c conda-forge openbabel==3.1.1```
   * [OpenBabel Anaconda package](https://anaconda.org/channels/conda-forge/packages/openbabel/overview)
-- OpenMPI 4.1.1: Download from [OpenMPI](https://www.open-mpi.org/software/ompi/v4.1/) *- strictly recommended for faster computing both for ORCA and DFTB+*
-- Multiwfn: Download from [Multiwfn](http://sobereva.com/multiwfn/)
+- OpenMPI 4.1.1: Download from [OpenMPI website](https://www.open-mpi.org/software/ompi/v4.1/) *- strictly recommended for faster computing both for ORCA and DFTB+*
+- ORCA ver. 5.0.3: Download from [ORCA official site](https://orcaforum.kofo.mpg.de/app.php/portal)
+- Multiwfn: Download from [Multiwfn official site](http://sobereva.com/multiwfn/)
 - Additional Python packages (install via conda):
-  * ```bash conda install -c conda-forge dftbplus==22.1``` - [DFTB+ Anaconda package](https://anaconda.org/channels/conda-forge/packages/dftbplus/overview) <ins>**nompi_h0154332_100**  build is extremely recommended</ins>
-  * ```bash conda install -c conda-forge plotly==XXX``` - [Plotly Anaconda package](https://anaconda.org/channels/conda-forge/packages/plotly/overview) Version 5.11.0 is recommended
-  * ```bash conda install -c conda-forge tsne``` - [TSNE Anaconda package](https://anaconda.org/channels/conda-forge/packages/tsne/overview)
+  * ```conda install -c conda-forge dftbplus==22.1=nompi_h0154332_100``` - [DFTB+ Anaconda package](https://anaconda.org/channels/conda-forge/packages/dftbplus/overview) <ins>nompi_h0154332_100  build is extremely recommended</ins>. You can also define the number of threads using ```bash export OMP_NUM_THREADS=n``` command
+  * ```conda install -c conda-forge plotly==5.24.1``` - [Plotly Anaconda package](https://anaconda.org/channels/conda-forge/packages/plotly/overview) Version 5.24.1 is recommended
+  * ```conda install -c conda-forge tsne``` - [TSNE Anaconda package](https://anaconda.org/channels/conda-forge/packages/tsne/overview)
+  * ```conda install -c conda-forge pandas==1.3.5``` - [Pandas Anaconda package](https://anaconda.org/channels/conda-forge/packages/pandas/overview)
+  * ```conda install -c conda-forge scikit-learn=1.0.2``` - [Sklearn Anaconda package](https://anaconda.org/channels/anaconda/packages/scikit-learn/overview)
+  * ```pip install -U kaleido``` - [Kaleido library](https://pypi.org/project/kaleido/1.0.0rc0/)
+Conda environment yaml file could be found in ```/src/subdate.yaml```
 
 ## Basic Workflow:
 
@@ -172,8 +205,8 @@ This workflow is designed for high-performance computing environments:
 
 * **Operating System**: Ubuntu 22.04 (the whole pipeline was developed, run, and tested on Ubuntu 22.04 only)
 
-[!TIP]
-The *ab initio* metaMD runtime and number of simultaneous calculaions should be chosen wisely in agreement with user's computational resources. Insufficient resources may cause "Out of Memory" crashes and very long runs of individual systems
+> **Tip:**
+The *ab initio* metaMD runtime and number of simultaneous calculations should be chosen wisely in agreement with user's computational resources. Insufficient resources may cause "Out of Memory" crashes and very long runtimes for individual systems
 
 ## Troubleshooting
 ### Common Issues:
