@@ -1,7 +1,6 @@
-# QTAIM-test_TZP-DKH
-! TightOPT NUMFREQ RKS RI TPSS ZORA-def2-TZVP SARC/J TightSCF SlowConv NOFINALGRID DEFGRID3 NoFrozenCore NOSOSCF 
+! TightOPT RKS RI TPSS ZORA-def2-TZVP SARC/J TightSCF SlowConv NOFINALGRIDX DefGRID3 NoFrozenCore NOSOSCF NUMFREQ
 
- * xyzfile 0 1 init.xyz
+ * xyzfile 0 1 opt.xyz
  
  %scf
  MaxIter 800
@@ -10,7 +9,7 @@
  end
 
  %pal
- nprocs 12
+ nprocs 15
  end
  
  %geom
@@ -31,8 +30,6 @@
  end
  
  %basis
- NewGTO Pt "SARC-ZORA-TZVP" end
+ NewGTO Pd "SARC-ZORA-TZVP" end
  NewGTO I "old-ZORA-TZVP" end
  end
- 
-                    
