@@ -36,7 +36,7 @@ Source code files are located in the `src/` directory, and usage examples can be
 │ ├── ORCA_launcher_multi.py # Parallel ORCA calculations
 │ ├── ORCA_2mkl_launcher.py # GBW to Molden conversion
 │ ├── XYZ_file_binder.py # Molecular linking tool
-| ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
+│ ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
 │ ├── opt_bader.inp # ORCA input template
 │ └── wfn_commands.txt # Multiwfn analysis script
 ├── examples/ # Example files and usage cases
