@@ -46,6 +46,8 @@ Source code files are located in the `src/` directory, and usage examples can be
 ## Scripts and configuraion files
 
 All scripts are located in the `src/` directory.
+> **Note:**
+All Python scripts should be run from the directory where they are located!
 
 ### 1. SMILES_to_XYZ.py
 
@@ -59,11 +61,13 @@ Converts SMILES strings to 3D XYZ coordinates using OpenBabel's UFF force field 
 
 **Usage:**
 ```bash
-python src/SMILES_to_XYZ.py n1ccccc1 pyridine.xyz 
+python SMILES_to_XYZ.py n1ccccc1 pyridine.xyz 
 ```
 ### 2. Ligand_generator.py
 
 Batch processes SMILES strings from a text file using SMILES_to_XYZ.py.
+> **Note:**
+Please, make sure the SMILES_to_XYZ.py file located in the same directory as well!
 
 **Features:**
 - Processes multiple SMILES strings from a file
@@ -73,7 +77,7 @@ Batch processes SMILES strings from a text file using SMILES_to_XYZ.py.
 
 **Usage:**
 ```bash
-python src/Ligand_generator.py examples/phosphate_molecules_examples generated_mols_dir
+python Ligand_generator.py examples/phosphate_molecules_examples generated_mols_dir
 ```
 ### 3. ORCA_launcher_multi.py
 
@@ -88,7 +92,7 @@ Organizes XYZ files and runs ORCA calculations with parallel execution.
 
 **Usage:**
 ```bash
-python src/ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary [num_parallel_flows]
+python ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary [num_parallel_flows]
 ```
 ### 4. ORCA_2mkl_launcher.py
 
@@ -101,7 +105,7 @@ Processes ORCA .gbw files to generate Molden format files.
 
 **Usage:**
 ```bash
-python src/ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_parent_folder_with_subdirs_containing_gbw_files
+python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_parent_folder_with_subdirs_containing_gbw_files
 ```
 ### 5. XYZ_file_binder.py
 
@@ -115,7 +119,7 @@ Links two XYZ files by removing specified atoms and creating new bonds.
 
 **Usage:**
 ```bash
-python src/XYZ_file_binder.py examples/A17_para_theozyme.xyz examples/Au_nitro.xyz Au 999
+python XYZ_file_binder.py examples/A17_para_theozyme.xyz examples/Au_nitro.xyz Au 999
 ```
 
 ### 6. Bader_PCA_analysis.py
@@ -132,7 +136,7 @@ Performs principal component analysis (PCA) on QTAIM-derived Bader descriptors a
 
 **Usage:**
 ```bash
-python src/Bader_PCA_analysis.py examples/QTAIM_data_example.csv 5 5
+python Bader_PCA_analysis.py examples/QTAIM_data_example.csv 5 5
 ```
 
 ### CONFIGURATION FILES
