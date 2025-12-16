@@ -30,24 +30,22 @@ This repository provides automated tools for computational chemistry research:
 
 Source code files are located in the `src/` directory, and usage examples can be found in the `examples/` directory.
 ```bash
-├── src/ # Source code directory
+├── src/ # Main directory containing source code example files 
+│ ├── examples/ # Example files and usage cases
 │ ├── SMILES_to_XYZ.py # SMILES to 3D structure conversion
 │ ├── Ligand_generator.py # Batch SMILES processing
 │ ├── ORCA_launcher_multi.py # Parallel ORCA calculations
 │ ├── ORCA_2mkl_launcher.py # GBW to Molden conversion
 │ ├── XYZ_file_binder.py # Molecular linking tool
-│ ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
+| ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
 │ ├── opt_bader.inp # ORCA input template
 │ └── wfn_commands.txt # Multiwfn analysis script
-├── examples/ # Example files and usage cases
 └── README.md # This file
 ```
 
 ## Scripts and configuraion files
 
 All scripts are located in the `src/` directory.
-> **Note:**
-All Python scripts should be run from the directory where they are located!
 
 ### 1. SMILES_to_XYZ.py
 
@@ -66,8 +64,6 @@ python SMILES_to_XYZ.py n1ccccc1 pyridine.xyz
 ### 2. Ligand_generator.py
 
 Batch processes SMILES strings from a text file using SMILES_to_XYZ.py.
-> **Note:**
-Please, make sure the SMILES_to_XYZ.py file located in the same directory as well!
 
 **Features:**
 - Processes multiple SMILES strings from a file
@@ -105,7 +101,7 @@ Processes ORCA .gbw files to generate Molden format files.
 
 **Usage:**
 ```bash
-python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_parent_folder_with_subdirs_containing_gbw_files
+python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary examples/gbw_test/
 ```
 ### 5. XYZ_file_binder.py
 

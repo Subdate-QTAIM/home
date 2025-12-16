@@ -1,0 +1,35 @@
+! TightOPT RKS RI TPSS ZORA-def2-TZVP SARC/J TightSCF SlowConv NOFINALGRIDX DefGRID3 NoFrozenCore NOSOSCF NUMFREQ
+
+ * xyzfile 0 1 opt.xyz
+ 
+ %scf
+ MaxIter 800
+ DIISMaxEq 15
+ directresetfreq 1
+ end
+
+ %pal
+ nprocs 1
+ end
+ 
+ %geom
+ MaxIter 300
+ end
+ 
+ %rel
+ method ZORA_RI
+ ModelPot 1, 1, 1, 1
+ ModelDens rhoZORA
+ PictureChange 1
+ FiniteNuc false
+ end
+ 
+ %method
+ GridPruning 0
+ IntAcc 10.0
+ end
+ 
+ %basis
+ NewGTO Pd "SARC-ZORA-TZVP" end
+ NewGTO I "old-ZORA-TZVP" end
+ end
