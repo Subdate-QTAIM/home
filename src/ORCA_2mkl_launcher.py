@@ -2,7 +2,8 @@
 """
 Simple script to walk through directories and run orca_2mkl on .gbw files.
 
-Usage: python run_orca_2mkl.py path_to_orca_2mkl_binary parent_folder
+Usage: python run_orca_2mkl.py path_to_orca_2mkl_binary [parent_folder]
+Example: python run_orca_2mkl.py /home/user/orca/orca_2mkl
 Example: python run_orca_2mkl.py /home/user/orca/orca_2mkl /path/to/parent/folder
 """
 
@@ -89,24 +90,58 @@ def run_orca_2mkl(orca_2mkl_path, directory, gbw_file):
             os.chdir(original_cwd)
         return False, f"Error: {str(e)}"
 
-def main():
-    if len(sys.argv) != 3:
-        print("Usage: python run_orca_2mkl.py path_to_orca_2mkl_binary parent_folder")
-        print("Example: python run_orca_2mkl.py /home/user/orca/orca_2mkl /path/to/parent/folder")
-        sys.exit(1)
+def validate_orca_2mkl_path(orca_2mkl_path):
+    """
+    Validate the orca_2mkl binary path.
     
-    orca_2mkl_path = sys.argv[1]
-    parent_folder = sys.argv[2]
+    Args:
+        orca_2mkl_path (str): Path to orca_2mkl binary
     
-    # Validate orca_2mkl binary
+    Returns:
+        bool: True if valid, False otherwise
+    """
     orca_2mkl_binary = Path(orca_2mkl_path)
+    
     if not orca_2mkl_binary.exists():
         print(f"Error: orca_2mkl binary not found: {orca_2mkl_path}")
-        sys.exit(1)
+        return False
     
     if not os.access(orca_2mkl_path, os.X_OK):
         print(f"Error: orca_2mkl binary is not executable: {orca_2mkl_path}")
+        return False
+    
+    return True
+
+def main():
+    if len(sys.argv) not in [2, 3]:
+        print("Usage: python run_orca_2mkl.py path_to_orca_2mkl_binary [parent_folder]")
+        print("Example: python run_orca_2mkl.py /home/user/orca/orca_2mkl")
+        print("Example: python run_orca_2mkl.py /home/user/orca/orca_2mkl /path/to/parent/folder")
+        print("\nIf parent_folder is not provided, current directory will be used.")
         sys.exit(1)
+    
+    orca_2mkl_path = sys.argv[1]
+    
+    # Validate orca_2mkl binary
+    if not validate_orca_2mkl_path(orca_2mkl_path):
+        sys.exit(1)
+    
+    # Determine parent folder
+    if len(sys.argv) == 3:
+        parent_folder = Path(sys.argv[2])
+    else:
+        parent_folder = Path.cwd()
+    
+    # Validate parent folder
+    if not parent_folder.exists():
+        print(f"Error: Parent folder not found: {parent_folder}")
+        sys.exit(1)
+    
+    if not parent_folder.is_dir():
+        print(f"Error: Path is not a directory: {parent_folder}")
+        sys.exit(1)
+    
+    print(f"Using parent folder: {parent_folder}")
     
     # Find all .gbw files
     gbw_files = find_gbw_files(parent_folder)
@@ -135,6 +170,7 @@ def main():
     # Summary
     print("=" * 60)
     print(f"Summary: {successful} successful, {failed} failed")
+    print(f"All files processed in: {parent_folder}")
     
     if failed > 0:
         sys.exit(1)
