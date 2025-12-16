@@ -3,7 +3,7 @@
 Script to organize XYZ files and run ORCA calculations with parallel execution.
 
 Features:
-- Finds all XYZ files in current directory
+- Asks user for directory containing XYZ files
 - Moves each XYZ file to its own folder named after the file
 - Renames XYZ files to "opt.xyz" in their respective folders
 - Copies a user-provided input template to each folder
@@ -23,18 +23,49 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import queue
 
-def find_xyz_files():
+def get_xyz_directory():
     """
-    Find all XYZ files in the current directory.
+    Ask user for directory containing XYZ files.
+    
+    Returns:
+        Path: Path object for the directory containing XYZ files
+    """
+    default_dir = Path.cwd()
+    
+    print(f"Current directory: {default_dir}")
+    user_input = input("Enter path to directory containing XYZ files (press Enter for current directory): ").strip()
+    
+    if not user_input:
+        xyz_dir = default_dir
+    else:
+        xyz_dir = Path(user_input)
+    
+    # Validate the directory
+    if not xyz_dir.exists():
+        print(f"Error: Directory does not exist: {xyz_dir}")
+        sys.exit(1)
+    
+    if not xyz_dir.is_dir():
+        print(f"Error: Path is not a directory: {xyz_dir}")
+        sys.exit(1)
+    
+    print(f"Using directory: {xyz_dir}")
+    return xyz_dir
+
+def find_xyz_files(xyz_dir):
+    """
+    Find all XYZ files in the specified directory.
+    
+    Args:
+        xyz_dir (Path): Directory to search for XYZ files
     
     Returns:
         list: List of Path objects for XYZ files
     """
-    current_dir = Path.cwd()
-    xyz_files = list(current_dir.glob("*.xyz"))
+    xyz_files = list(xyz_dir.glob("*.xyz"))
     
     if not xyz_files:
-        print("No XYZ files found in the current directory.")
+        print(f"No XYZ files found in directory: {xyz_dir}")
         return []
     
     print(f"Found {len(xyz_files)} XYZ file(s):")
@@ -59,7 +90,7 @@ def create_folders_and_move_files(xyz_files):
     for xyz_file in xyz_files:
         # Get folder name (without extension)
         folder_name = xyz_file.stem
-        folder_path = Path(folder_name)
+        folder_path = xyz_file.parent / folder_name
         
         # Create folder if it doesn't exist
         folder_path.mkdir(exist_ok=True)
@@ -73,13 +104,14 @@ def create_folders_and_move_files(xyz_files):
     
     return folder_mapping
 
-def copy_input_template(folder_mapping, input_template_path):
+def copy_input_template(folder_mapping, input_template_path, xyz_dir):
     """
     Copy input template to each folder.
     
     Args:
         folder_mapping (dict): Dictionary mapping folder names to file paths
         input_template_path (str): Path to input template file
+        xyz_dir (Path): Base directory where folders are located
     
     Returns:
         bool: True if successful, False otherwise
@@ -95,7 +127,7 @@ def copy_input_template(folder_mapping, input_template_path):
         return False
     
     for folder_name in folder_mapping.keys():
-        folder_path = Path(folder_name)
+        folder_path = xyz_dir / folder_name
         destination = folder_path / input_path.name
         
         try:
@@ -151,18 +183,19 @@ def check_orca_termination(out_file_path):
     except Exception as e:
         return False, f"Error reading output file: {e}"
 
-def run_single_orca_calculation(folder_name, orca_binary_path):
+def run_single_orca_calculation(folder_name, orca_binary_path, xyz_dir):
     """
     Run a single ORCA calculation in a specific folder.
     
     Args:
         folder_name (str): Name of the folder containing the calculation
         orca_binary_path (str): Path to ORCA binary
+        xyz_dir (Path): Base directory where folders are located
     
     Returns:
         tuple: (folder_name, bool, str) - (folder name, True if successful, status message)
     """
-    folder_path = Path(folder_name)
+    folder_path = xyz_dir / folder_name
     
     if not folder_path.exists():
         return (folder_name, False, f"Folder not found: {folder_name}")
@@ -238,7 +271,7 @@ def run_single_orca_calculation(folder_name, orca_binary_path):
         print(f"[FLOW {thread_id}] ✗ Error: {folder_name} - {error_msg}")
         return (folder_name, False, error_msg)
 
-def run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_flows):
+def run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_flows, xyz_dir):
     """
     Run ORCA calculations in parallel with specified number of flows.
     
@@ -246,6 +279,7 @@ def run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_
         folder_names (list): List of folder names to process
         orca_binary_path (str): Path to ORCA binary
         num_parallel_flows (int): Number of parallel calculations to run
+        xyz_dir (Path): Base directory where folders are located
     
     Returns:
         dict: Dictionary mapping folder names to (success, message) tuples
@@ -260,7 +294,7 @@ def run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_
         # Submit all tasks and create a mapping of future to folder name
         future_to_folder = {}
         for folder_name in folder_names:
-            future = executor.submit(run_single_orca_calculation, folder_name, orca_binary_path)
+            future = executor.submit(run_single_orca_calculation, folder_name, orca_binary_path, xyz_dir)
             future_to_folder[future] = folder_name
         
         # Monitor progress and collect results
@@ -356,9 +390,15 @@ def main():
         sys.exit(1)
     
     try:
+        # Step 0: Get directory containing XYZ files
+        print("=" * 80)
+        print("ORCA CALCULATION LAUNCHER")
+        print("=" * 80)
+        xyz_dir = get_xyz_directory()
+        
         # Step 1: Find XYZ files
-        print("Step 1: Finding XYZ files...")
-        xyz_files = find_xyz_files()
+        print("\nStep 1: Finding XYZ files...")
+        xyz_files = find_xyz_files(xyz_dir)
         
         if not xyz_files:
             print("No XYZ files to process. Exiting.")
@@ -370,7 +410,7 @@ def main():
         
         # Step 3: Copy input template
         print("\nStep 3: Copying input template...")
-        if not copy_input_template(folder_mapping, input_template_path):
+        if not copy_input_template(folder_mapping, input_template_path, xyz_dir):
             print("Error copying input template. Exiting.")
             sys.exit(1)
         
@@ -380,7 +420,7 @@ def main():
         print(f"Number of parallel flows: {num_parallel_flows}")
         
         folder_names = list(folder_mapping.keys())
-        results = run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_flows)
+        results = run_parallel_orca_calculations(folder_names, orca_binary_path, num_parallel_flows, xyz_dir)
         
         # Step 5: Generate report
         print("\n" + "="*80)
@@ -401,9 +441,11 @@ def main():
         
         if failed:
             print(f"\nSome calculations failed. Check the individual output files for details.")
+            print(f"All calculations were performed in: {xyz_dir}")
             sys.exit(1)
         else:
             print(f"\nAll calculations completed successfully!")
+            print(f"All calculations were performed in: {xyz_dir}")
         
     except KeyboardInterrupt:
         print("\n\nCalculation interrupted by user.")
