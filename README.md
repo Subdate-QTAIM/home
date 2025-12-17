@@ -37,7 +37,7 @@ Source code files are located in the `src/` directory, and usage examples can be
 │ ├── ORCA_launcher_multi.py # Parallel ORCA calculations
 │ ├── ORCA_2mkl_launcher.py # GBW to Molden conversion
 │ ├── XYZ_file_binder.py # Molecular linking tool
-| ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
+│ ├── Bader_PCA_analysis.py # QTAIM data PCA analysis and visualization
 │ ├── opt_bader.inp # ORCA input template
 │ └── wfn_commands.txt # Multiwfn analysis script
 └── README.md # This file
@@ -91,7 +91,7 @@ Organizes XYZ files and runs ORCA calculations with parallel execution.
 python ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary [num_parallel_flows]
 ```
 > **Tip:**
-[num_parallel_flows] - number of sumultaneous running queues
+[num_parallel_flows] - number of sumultaneous running queues. The number of threads for single calulation is defined on ORCA input file (opt_bader.inp)
 ### 4. ORCA_2mkl_launcher.py
 
 Processes ORCA .gbw files to generate Molden format files.
