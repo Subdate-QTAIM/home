@@ -90,6 +90,8 @@ Organizes XYZ files and runs ORCA calculations with parallel execution.
 ```bash
 python ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary [num_parallel_flows]
 ```
+> **Tip:**
+[num_parallel_flows] - number of sumultaneous running queues
 ### 4. ORCA_2mkl_launcher.py
 
 Processes ORCA .gbw files to generate Molden format files.
