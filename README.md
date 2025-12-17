@@ -174,7 +174,7 @@ The ```examples/``` directory contains several theozyme structures in XYZ format
 - OpenBabel 3.1.1: Install via conda: ```conda install -c conda-forge openbabel==3.1.1```
   * [OpenBabel Anaconda package](https://anaconda.org/channels/conda-forge/packages/openbabel/overview)
 - OpenMPI 4.1.1: Download from [OpenMPI website](https://www.open-mpi.org/software/ompi/v4.1/) *- strictly recommended for faster computing both for ORCA and DFTB+*
-- ORCA ver. 5.0.3: Download from [ORCA official site]([https://orcaforum.kofo.mpg.de/app.php/portal](https://orcaforum.kofo.mpg.de/app.php/dlext/?cat=20))
+- ORCA ver. 5.0.3: Download from [ORCA official site](https://orcaforum.kofo.mpg.de/app.php/dlext/?cat=20)
 - Multiwfn: Download from [Multiwfn official site](http://sobereva.com/multiwfn/)
 - Additional Python packages (install via conda):
   * ```conda install -c conda-forge dftbplus==22.1=nompi_h0154332_100``` - [DFTB+ Anaconda package](https://anaconda.org/channels/conda-forge/packages/dftbplus/overview) <ins>nompi_h0154332_100  build is extremely recommended</ins>. You can also define the number of threads using ```bash export OMP_NUM_THREADS=n``` command
