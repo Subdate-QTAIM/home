@@ -1,0 +1,116 @@
+Geometry = xyzFormat {
+<<< "init.xyz"
+}
+
+Driver = VelocityVerlet {
+
+ 
+Plumed = yes
+
+ MovedAtoms = !(458:483)
+ TimeStep [fs] = 0.5
+ Steps = 1000000
+ KeepStationary = Yes
+ MDRestartFrequency = 10
+# ConvergentForcesOnly = Yes
+ 
+ Thermostat = Berendsen {
+    Temperature [K] = 298.15
+    Timescale[fs] = 1000.0
+ }
+# Barostat = {
+#    Pressure [Pa] = 101325.0
+#    Timescale[fs] = 100.0
+#    Isotropic = Yes
+# }
+}
+
+Hamiltonian = xTB {
+  Method = "GFN1-xTB"
+  
+  Solvation = GeneralizedBorn { # GFN1-xTB/GBSA(water)
+	Solvent = fromConstants {
+	Epsilon = 78.50000000
+	MolecularMass [amu] = 18.00000000
+	Density [kg/l] = 0.99800000
+	}
+	FreeEnergyShift [kcal/mol] = 1.30237749
+	BornScale = 1.58079374
+	BornOffset [AA] = 0.00719451
+	Radii = vanDerWaalsRadiiD3 {}
+	Descreening = Values {
+		H  =  0.56096524
+		B  =  0.87090890
+		C  =  0.72864610
+		N  =  0.68108723
+		O  =  0.30000000
+		P  =  0.83587791
+		S  =  0.30000000
+		Se =  0.54226862
+		Br =  0.90076995
+		Pd =  1.22251791
+		}
+	SASA {
+	ProbeRadius [AA] = 0.72623504
+	Radii = vanDerWaalsRadiiD3 {}
+	SurfaceTension = Values {
+		H  =   0.06629666
+		B  =  -0.03791420
+		C  =  -1.07723180
+		N  =   1.16603570
+		O  =   3.68076258
+		P  =  -0.78733572
+		S  =  -0.51028830
+		Se =   0.06179828
+		Br =  -0.53490697
+		Pd =  -0.72357001
+		}
+	}
+	HBondCorr = Yes
+	HBondStrength = Values {
+		H  = -2.6127067967e-02
+		B  = -0.0000000000e+00
+		C  = -9.6087240194e-03
+		N  = -1.1412501648e-03
+		O  = -4.8571298193e-03
+		P  = -3.6175690321e-02
+		S  = -2.4189882884e-02
+		Se = -1.9213319349e-02
+		Br = -2.7179720184e-02
+		Pd = -0.0000000000e+00
+	}
+  }
+  
+  ReadInitialCharges = No
+  
+  SCCTolerance = 1.e-06
+  MaxSCCIterations = 500
+  
+  #EwaldParameter = -1.0
+  #EwaldTolerance = 1.e-06
+  
+  Mixer = Broyden {} #Broyden
+  Solver = DivideAndConquer {}
+  Filling = Fermi {
+
+  Temperature [K] = 298.15
+
+}
+  
+  #KPointsAndWeights = { # Gamma-point only (There is no metals)
+  #0.0 0.0 0.0 1.0
+  #}
+    
+  Charge = -1
+
+}
+
+Options = {
+  WriteAutotestTag = Yes
+  WriteResultsTag = Yes
+}
+
+ParserOptions = {
+  ParserVersion = 11
+}
+
