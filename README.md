@@ -7,8 +7,7 @@ generation, quantum chemistry calculations, and data processing.
 ## Table of Contents
 - [Overview](#overview)
 - [Directory Structure](#directory-structure)
-- [Scripts and Files](#scripts-and-files)
-- [Configuration Files](#configuration-files)
+- [Scripts and Configuraion Files](#Scripts-and-configuraion-files)
 - [Quick Start](#quick-start)
 - [System Requirements](#system-requirements)
 - [Troubleshooting](#troubleshooting)
@@ -103,11 +102,12 @@ Processes ORCA .gbw files to generate Molden format files.
 **Features:**
 - Recursively finds .gbw files in directories
 - Runs orca_2mkl conversion with Molden output
+- Runs Multiwfn electron density topology analysis
 - Handles multiple files efficiently
 
 **Usage:**
 ```bash
-python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_parent_folder_with_subdirs_containing_gbw_files
+python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_Multiwfn_binary path_to_parent_folder_with_subdirs_containing_gbw_files
 ```
 ### 5. XYZ_file_binder.py
 
@@ -362,6 +362,63 @@ Conda environment yaml file could be found in ```/src/subdate.yaml```
 3. Convert output gbw files into molden input files
 
 4. Analyze wavefunctions
+
+## How to reproduce reference research article pipeline:
+
+1. Download the archive
+2. Go to the ```src``` directory and create new conda environment using command:
+```bash
+conda env create -f subdate.yaml
+```
+Activate conda environment using commands
+```bash
+conda deactivate
+conda activate subdate
+```
+Make sure you are located in the ```src``` directory
+
+3. Create XYZ files from SMILES
+```bash
+python Ligand_generator.py examples/Step_1_PO_compounds_smiles_library/Full_PO_mols Full_PO_mols_dir
+# Full-atomic PO molecules for subsequent DFT optimization from reference paper
+python Ligand_generator.py examples/Step_1_PO_compounds_smiles_library/Linked_groups Linked_groups_dir
+# Au atom containing linker groups for theozyme modifications only (to reproduce original systems from reference paper)
+```
+4. Optimize created PO molecules using QM calculations
+ - Make sure you installed ORCA 5.0.3 and openmpi-411 properly
+ - Edit ```opt_bader.inp``` input file for your system if needed (number of threads, memory usage etc)
+ - Run corresponding script for automated geometry optimization protocol
+ ```bash
+python ORCA_launcher_multi.py examples/opt_bader.inp path_to_orca_binary 1
+# Select Full_PO_mols_dir during the run of the script
+```
+The optimization procedure may run up to several days on the regular CPU server. For each calculation 12-15 threads is recommended. 
+Otherwise, you can find optimized geometries in ```examples/Step_2_PO_compounds``` folder and the corresponding electon density topology in ```examples/Step_3_PO_compounds_electron_density``` directory.
+
+5. Run electron density topology analysis
+- Make sure you installed Multiwfn properly
+- Make sure you specified all parameters in ```settings.ini``` in Multiwfn directory for your system properly
+ - Run corresponding script for automated electron density topology analysis protocol
+ ```bash
+# If you want to test pre-defined GBW files
+python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_Multiwfn_binary examples/Step_3_PO_compounds_electron_density
+# If you want to test your own computed GBW files
+python ORCA_2mkl_launcher.py path_to_orca_2mkl_binary path_to_Multiwfn_binary Full_PO_mols_dir
+```
+6. Create theozyme gemetries using script
+ ```bash
+python XYZ_file_binder.py examples/Step_3_Theozymes/A17_para_theozyme.xyz Linked_groups/[Au]([S+](C)C).xyz.xyz Au 999
+# or for pre-defined groups
+python XYZ_file_binder.py examples/Step_3_Theozymes/A17_para_theozyme.xyz examples/Step_2_PO_compounds/For_links/[Au]([S+](C)C).xyz.xyz Au 999
+```
+You can examine various ligand derivatives by yourself adding various linker atoms in different positions in the corresponding theozyme XYZ file
+
+7. If you would like to examine the chemical space analysis itself, please, look [Scripts and Configuraion Files](#Scripts-and-configuraion-files) chapter,  [Bader_PCA_analysis.py](#Bader_PCA_analysis.py) section\
+The example of typical QTAIM data is provided in csv file located ```examples/QTAIM_data_example.csv```
+You can utilize your own QTAIM data for the corresponding analysis
+
+8. If you would like to test metadynamics calculculaions itself, please, look [Scripts and Configuraion Files](#Scripts-and-configuraion-files) chapter,  [Running DFTB+ Metadynamics Simulations](#Running-DFTB+-Metadynamics-Simulations) section
+The example of launch-ready theozyme systems could be found in ```examples/Step_4_metamd_theozymes_ready``` folder
 
 ## System Requirements
 
