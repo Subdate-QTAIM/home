@@ -1,0 +1,27 @@
+Branch‑and‑Bound Rounds Assignment
+============================================================
+Input file: COSMO_QTAIM_example_mini.csv
+Clustering: Ward, Euclidean
+BnB parameters: max_depth=6, min_branch_size=2
+Total compounds: 16
+Global best ΔG: 9.000 (Compound: Entry11)
+Best ΔG found by BnB: 9.000
+============================================================
+
+Round 1: demasked 1 compound(s): Entry14
+  Kept branches: [30]
+  Filtered branches: []
+    Branch 30 members: Entry0, Entry1, Entry2, Entry3, Entry4, Entry5, Entry6, Entry7, Entry8, Entry9, Entry10, Entry11, Entry12, Entry13, Entry14, Entry15
+
+Round 2: demasked 1 compound(s): Entry10
+  Kept branches: [28]
+  Filtered branches: [29]
+    Branch 28 members: Entry10, Entry11
+
+Round 3: demasked 1 compound(s): Entry11
+  Kept branches: []
+  Filtered branches: []
+
+Terminal clusters after BnB:
+  Cluster 11: medoid Entry11 (ΔG=9.000), members: Entry11
+  Cluster 10: medoid Entry10 (ΔG=9.800), members: Entry10
